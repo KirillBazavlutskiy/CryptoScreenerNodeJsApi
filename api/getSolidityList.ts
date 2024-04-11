@@ -1,17 +1,16 @@
-import {SolidityFinderService} from "../services/SolidityFinderService/SolidityFinderService.service";
-import {SolidityModel} from "../models/SolidityFinderModels.model";
+import {SolidityFinderService} from "../../back/services/SolidityFinderService/SolidityFinderService.service";
+import {SolidityModel} from "../../back/models/SolidityFinderModels.model";
+import type {VercelRequest, VercelResponse} from "@vercel/node";
 
-const router = Router();
 let SolidityList: SolidityModel[] = [];
+const SFS = new SolidityFinderService();
+
+SFS.FindAllSolidity(100000, 0, 0, 0).then(data => SolidityList = data)
 
 setInterval(async () => {
-  const SFS = new SolidityFinderService();
   SolidityList = await SFS.FindAllSolidity(100000, 0, 0, 0);
 }, 5 * 60 * 1000);
 
-router.get('/', (req: Request, res: Response<SolidityModel[]>) => {
-  res.send(SolidityList);
-});
-
-
-export default router;
+export default function handler(req: VercelRequest, res: VercelResponse) {
+  return res.json(SolidityList);
+}
