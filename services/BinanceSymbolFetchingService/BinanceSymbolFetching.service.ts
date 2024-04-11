@@ -12,11 +12,11 @@ export class BinanceSymbolFetchingService {
   FetchAllSymbols = async (minVolume: number): Promise<DailyStatsResult[]> => {
     try {
       const tickers = await this.client.dailyStats().catch(error => {
-        throw new Error('Failed to fetch daily stats');
+        throw new Error(`Failed to fetch daily stats: ${error.message}`);
       });
 
       const futuresSymbolsInfo = await this.client.futuresExchangeInfo().catch(error => {
-        throw new Error('Failed to fetch futures exchange info');
+        throw new Error(`Failed to fetch futures exchange info: ${error.message}`);
       });
       const futuresSymbols = futuresSymbolsInfo.symbols.map(symbolInfo => symbolInfo.symbol);
       const tickersFixed: DailyStatsResult[] = JSON.parse(JSON.stringify(tickers));
