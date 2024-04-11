@@ -1,6 +1,6 @@
-import {SolidityFinderService} from "../../back/services/SolidityFinderService/SolidityFinderService.service";
-import {SolidityModel} from "../../back/models/SolidityFinderModels.model";
 import type {VercelRequest, VercelResponse} from "@vercel/node";
+import {SolidityFinderService} from "../services/SolidityFinderService/SolidityFinderService.service";
+import {SolidityModel} from "../models/SolidityFinderModels.model";
 
 let SolidityList: SolidityModel[] = [];
 const SFS = new SolidityFinderService();
