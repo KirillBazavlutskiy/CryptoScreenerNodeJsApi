@@ -11,6 +11,6 @@ setInterval(async () => {
   SolidityList = await SFS.FindAllSolidity(100000, 0, 0, 0);
 }, 5 * 60 * 1000);
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
+export default function(req: VercelRequest, res: VercelResponse) {
   return res.json(SolidityList);
 }
