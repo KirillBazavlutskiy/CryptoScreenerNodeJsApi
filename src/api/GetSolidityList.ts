@@ -1,6 +1,6 @@
-import type {VercelRequest, VercelResponse} from "@vercel/node";
 import {SolidityFinderService} from "../services/SolidityFinderService/SolidityFinderService.service";
 import {SolidityModel} from "../models/SolidityFinderModels.model";
+import {Request, Response} from "express";
 
 let SolidityList: SolidityModel[] = [];
 const SFS = new SolidityFinderService();
@@ -11,6 +11,6 @@ setInterval(async () => {
   SolidityList = await SFS.FindAllSolidity(100000, 0, 0, 0);
 }, 5 * 60 * 1000);
 
-export default function(req: VercelRequest, res: VercelResponse) {
-  return res.json(SolidityList);
+export function GetSolidityListHandler(req: Request, res: Response<SolidityModel[]>) {
+  res.send(SolidityList);
 }
