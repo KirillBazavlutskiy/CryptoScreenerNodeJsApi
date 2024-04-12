@@ -5,7 +5,7 @@ export class CandleAnalyzeService {
 
   constructor() {
     this.client = Binance({
-      proxy: "http://86.190.139.131:80"
+      proxy: "http://193.253.220.32:80"
     });
   }
 
