@@ -4,9 +4,7 @@ export class BinanceSymbolFetchingService {
   private client;
 
   constructor() {
-    this.client = Binance({
-      proxy: "http://193.253.220.32:80"
-    });
+    this.client = Binance();
   }
 
   FetchAllSymbols = async (minVolume: number): Promise<DailyStatsResult[]> => {

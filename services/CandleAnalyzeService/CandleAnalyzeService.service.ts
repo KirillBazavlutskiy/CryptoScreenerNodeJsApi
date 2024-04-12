@@ -4,9 +4,7 @@ export class CandleAnalyzeService {
   private client;
 
   constructor() {
-    this.client = Binance({
-      proxy: "http://193.253.220.32:80"
-    });
+    this.client = Binance();
   }
 
   CheckPriceTouchingOnPeriod = async (symbol: string, targetPrice: number, durationMinutes: number) => {
