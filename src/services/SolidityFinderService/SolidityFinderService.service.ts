@@ -56,7 +56,7 @@ export class SolidityFinderService {
         Ratio: solidityRatio,
         UpToPrice: this.binanceOrdersCalculatingKit.CalcSimplifiedRatio(upToPrice, solidityType) * 100,
         NonConcernPeriod: nonConcernPeriod,
-        candleTouches: candleTouches
+        CandleTouches: candleTouches
       };
 
       return {
