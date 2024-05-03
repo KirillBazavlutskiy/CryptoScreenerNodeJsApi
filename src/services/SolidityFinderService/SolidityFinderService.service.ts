@@ -9,15 +9,17 @@ import {BinanceOrdersCalculatingKit} from "../BinanceOrdersCalculationKit/Binanc
 export class SolidityFinderService {
   private client;
   binanceOrdersCalculatingKit: BinanceOrdersCalculatingKit;
+  candleAnalyzeService: CandleAnalyzeService;
 
   constructor() {
     this.client = Binance();
     this.binanceOrdersCalculatingKit = new BinanceOrdersCalculatingKit();
+    this.candleAnalyzeService = new CandleAnalyzeService();
   }
 
   FindSolidity = async (ticket: DailyStatsResult): Promise<SolidityModel | null> => {
     try {
-      let orderBook: OrderBook = await this.client.book({ symbol: ticket.symbol });;
+      let orderBook: OrderBook = await this.client.book({ symbol: ticket.symbol });
 
       const calculateMaxValue = (orders: Bid[]) => {
         return orders.reduce((acc, order) => {
@@ -44,6 +46,7 @@ export class SolidityFinderService {
       if (orderBook.asks.findIndex(bid => parseFloat(bid.price) === maxOrderPrice) !== -1) {
         solidityType = 'asks';
       }
+      const { nonConcernPeriod, candleTouches } = await this.candleAnalyzeService.GetNonConcernPeriod(ticket.symbol, maxOrderPrice)
 
       const solidityTicket: SolidityTicket = {
         Type: solidityType,
@@ -51,7 +54,9 @@ export class SolidityFinderService {
         Quantity: maxOrder,
         MaxQuantity: maxOrder,
         Ratio: solidityRatio,
-        UpToPrice: this.binanceOrdersCalculatingKit.CalcSimplifiedRatio(upToPrice, solidityType) * 100
+        UpToPrice: this.binanceOrdersCalculatingKit.CalcSimplifiedRatio(upToPrice, solidityType) * 100,
+        NonConcernPeriod: nonConcernPeriod,
+        candleTouches: candleTouches
       };
 
       return {
@@ -65,7 +70,7 @@ export class SolidityFinderService {
     }
   };
 
-  FindAllSolidity = async (minVolume: number, ratioAccess: number, upToPriceAccess: number, checkReachingPriceDuration: number):  Promise<SolidityModel[]> => {
+  FindAllSolidity = async (minVolume: number, ratioAccess: number, upToPriceAccess: number):  Promise<SolidityModel[]> => {
     let symbolsWithSolidity: SolidityModel[] = [];
 
     const BSFS = new BinanceSymbolFetchingService();
@@ -96,25 +101,10 @@ export class SolidityFinderService {
           })
         );
       }
-
-      if (checkReachingPriceDuration !== 0) {
-        let filteredSymbolsWithSolidity: SolidityModel[] = [];
-
-        await Promise.all(
-          symbolsWithSolidity.map(async (symbolWithSolidity) => {
-            const result = !(await CAS.CheckPriceTouchingOnPeriod(symbolWithSolidity.Symbol, symbolWithSolidity.Solidity.Price, checkReachingPriceDuration));
-            if (result) {
-              filteredSymbolsWithSolidity.push(symbolWithSolidity);
-            }
-          })
-        );
-
-        symbolsWithSolidity = filteredSymbolsWithSolidity;
-      }
-
     } catch (e) {
       throw e;
     }
+    console.log(`Founded Symbols: ${symbolsWithSolidity.length}`)
     return symbolsWithSolidity;
   };
 }

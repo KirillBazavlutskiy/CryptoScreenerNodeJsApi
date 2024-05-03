@@ -7,22 +7,35 @@ export class CandleAnalyzeService {
     this.client = Binance();
   }
 
-  CheckPriceTouchingOnPeriod = async (symbol: string, targetPrice: number, durationMinutes: number) => {
+  GetNonConcernPeriod = async (symbol: string, targetPrice: number) => {
     try {
       const candles = await this.client.candles({
         symbol,
-        interval: CandleChartInterval.ONE_MINUTE,
-        limit: durationMinutes,
+        interval: CandleChartInterval.FIFTEEN_MINUTES,
+        limit: 1000,
       });
 
-      let checkResult = false;
+      let nonConcernPeriod: number = 0;
+      let candleTouches: number = 0;
 
-      candles.forEach(candle => {
-        const result = parseFloat(candle.low) < targetPrice && targetPrice < parseFloat(candle.high);
-        if (result) checkResult = true;
-      });
+      try {
+        candles.reverse().forEach(candle => {
+          const result = targetPrice < Number(candle.low) || Number(candle.high) < targetPrice;
+          if (result) {
+            nonConcernPeriod++;
+            if (Number(candle.low) === targetPrice || Number(candle.high) === targetPrice) {
+              candleTouches++;
+            }
+          } else {
+            throw new Error("Non-concern period has been ended!")
+          }
+        });
+      } catch (e) {}
 
-      return checkResult;
+      return {
+        nonConcernPeriod,
+        candleTouches
+      };
     } catch (e) {
       throw e;
     }

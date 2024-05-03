@@ -14,4 +14,6 @@ export interface SolidityTicket {
   MaxQuantity: number;
   Ratio: number;
   UpToPrice: number;
+  NonConcernPeriod: number
+  CandleTouches: number
 }
